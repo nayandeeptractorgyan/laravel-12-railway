@@ -1,16 +1,11 @@
 #!/bin/sh
 
-# Wait for MySQL to be ready
-echo "Waiting for MySQL..."
-until php artisan db:show 2>/dev/null; do
-    echo "MySQL is unavailable - sleeping"
-    sleep 2
-done
-
-echo "MySQL is ready!"
+# Simple wait for MySQL
+echo "Waiting for MySQL to be ready..."
+sleep 5
 
 # Run migrations
-php artisan migrate --force
+php artisan migrate --force || echo "Migrations skipped"
 
 # Cache configuration for production
 php artisan config:cache

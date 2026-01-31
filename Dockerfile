@@ -3,8 +3,9 @@ FROM php:8.4-fpm-alpine
 # Install nginx and supervisor
 RUN apk add --no-cache nginx supervisor nodejs npm
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql opcache
+# Install PHP extensions (ADDED icu-dev and intl)
+RUN apk add --no-cache icu-dev \
+    && docker-php-ext-install pdo pdo_mysql opcache intl
 
 # Install composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -28,11 +29,11 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/start.sh /start.sh
 
-# Set permissions and prepare for SQLite
+# Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 storage bootstrap/cache \
     && chmod +x /start.sh
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["/start.sh"]
